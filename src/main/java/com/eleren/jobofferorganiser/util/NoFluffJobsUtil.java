@@ -62,7 +62,7 @@ public class NoFluffJobsUtil implements WebsiteUtil {
         StringBuilder url = new StringBuilder();
         url.append("https://nofluffjobs.com/pl/jobs/");
         url.append(searchOptionsDto.getLocation()).append("/");
-        url.append(searchOptionsDto.getProgrammingLanguage()).append("?");
+        url.append(searchOptionsDto.getTechnology()).append("?");
         url.append("criteria=");
         if (!searchOptionsDto.getExperienceLevel().equals("")) {
             url.append("seniority%3D");

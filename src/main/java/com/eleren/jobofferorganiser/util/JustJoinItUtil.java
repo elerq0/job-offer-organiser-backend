@@ -54,11 +54,19 @@ public class JustJoinItUtil implements WebsiteUtil {
     @Override
     public String buildUrl() {
         StringBuilder url = new StringBuilder();
-        url.append("https://justjoin.it/");
-        url.append(searchOptionsDto.getLocation().toLowerCase());
-        url.append("/").append(searchOptionsDto.getProgrammingLanguage().toLowerCase());
-        if (!searchOptionsDto.getExperienceLevel().equals(""))
-            url.append("/").append(searchOptionsDto.getExperienceLevel().toLowerCase());
+        if (getImplementedCategoryList().contains(searchOptionsDto.getTechnology().toLowerCase())) {
+            url.append("https://justjoin.it/");
+            url.append(searchOptionsDto.getLocation().toLowerCase());
+            url.append("/").append(searchOptionsDto.getTechnology().toLowerCase());
+            if (!searchOptionsDto.getExperienceLevel().equals(""))
+                url.append("/").append(searchOptionsDto.getExperienceLevel().toLowerCase());
+        } else {
+            url.append("https://justjoin.it/?q=");
+            url.append(searchOptionsDto.getTechnology()).append("@skill;");
+            url.append(searchOptionsDto.getLocation()).append("@city");
+            if (!searchOptionsDto.getExperienceLevel().equals(""))
+                url.append(";").append(searchOptionsDto.getExperienceLevel()).append("@keyword");
+        }
 
         return url.toString();
     }
@@ -69,4 +77,9 @@ public class JustJoinItUtil implements WebsiteUtil {
 
         return offerSimpleDtoList;
     }
+
+    private List<String> getImplementedCategoryList() {
+        return List.of("javascript", "html", "php", "ruby", "python", "java", ".net", "scala", "c", "mobile", "devops");
+    }
+
 }

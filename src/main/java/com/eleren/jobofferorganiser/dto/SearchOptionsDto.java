@@ -4,17 +4,10 @@ public class SearchOptionsDto {
 
     private String title;
     private String location;
-    private String programmingLanguage;
+    private String technology;
     private String experienceLevel;
 
     public SearchOptionsDto() {
-    }
-
-    public SearchOptionsDto(String title, String location, String programmingLanguage, String experienceLevel) {
-        this.title = title;
-        this.location = location;
-        this.programmingLanguage = programmingLanguage;
-        this.experienceLevel = experienceLevel;
     }
 
     public String getTitle() {
@@ -33,12 +26,12 @@ public class SearchOptionsDto {
         this.location = location;
     }
 
-    public String getProgrammingLanguage() {
-        return programmingLanguage;
+    public String getTechnology() {
+        return technology;
     }
 
-    public void setProgrammingLanguage(String programmingLanguage) {
-        this.programmingLanguage = programmingLanguage;
+    public void setTechnology(String technology) {
+        this.technology = technology;
     }
 
     public String getExperienceLevel() {

@@ -66,8 +66,8 @@ public class IndeedUtil implements WebsiteUtil {
         StringBuilder titleStr = new StringBuilder();
         if (!searchOptionsDto.getExperienceLevel().equals(""))
             titleStr.append(searchOptionsDto.getExperienceLevel()).append(" ");
-        if (!searchOptionsDto.getProgrammingLanguage().equals(""))
-            titleStr.append(searchOptionsDto.getProgrammingLanguage()).append(" ");
+        if (!searchOptionsDto.getTechnology().equals(""))
+            titleStr.append(searchOptionsDto.getTechnology()).append(" ");
         titleStr.append(searchOptionsDto.getTitle());
 
         return "https://pl.indeed.com/praca?q=" +

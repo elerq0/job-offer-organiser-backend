@@ -7,11 +7,6 @@ public class ProxyDto {
     public ProxyDto() {
     }
 
-    public ProxyDto(String address, int port) {
-        this.address = address;
-        this.port = port;
-    }
-
     public String getAddress() {
         return address;
     }

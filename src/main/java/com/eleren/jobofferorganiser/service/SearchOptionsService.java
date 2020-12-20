@@ -17,7 +17,7 @@ public class SearchOptionsService {
     SearchOptionsRepository searchOptionsRepository;
 
     @Autowired
-    ProgrammingLanguageRepository programmingLanguageRepository;
+    TechnologyRepository technologyRepository;
 
     @Autowired
     ExperienceLevelRepository experienceLevelRepository;
@@ -29,12 +29,12 @@ public class SearchOptionsService {
         return searchOptionsRepository.findAllByUser(user);
     }
 
-    public long create(User user, String title, String location, List<String> programmingLanguages,
+    public long create(User user, String title, String location, List<String> technologies,
                        List<String> experienceLevels, List<String> websites) throws Exception {
         SearchOptions searchOptions = new SearchOptions(user, title, location);
-        for (String programmingLanguage : programmingLanguages)
-            searchOptions.addProgrammingLanguage(programmingLanguageRepository.findByName(programmingLanguage)
-                    .orElseThrow(() -> new Exception("Programming language [" + programmingLanguage + "] does not exist in the database")));
+        for (String technology : technologies)
+            searchOptions.addTechnology(technologyRepository.findByName(technology)
+                    .orElseThrow(() -> new Exception("Technology [" + technology + "] does not exist in the database")));
 
         for (String experienceLevel : experienceLevels)
             searchOptions.addExperienceLevel(experienceLevelRepository.findByName(experienceLevel)
@@ -63,8 +63,8 @@ public class SearchOptionsService {
             throw new Exception("You do not have access to that search options!");
     }
 
-    public Iterable<ProgrammingLanguage> getAvailableProgrammingLanguages() {
-        return programmingLanguageRepository.findAll();
+    public Iterable<Technology> getAvailableTechnologies() {
+        return technologyRepository.findAllByOrderByName();
     }
 
     public Iterable<ExperienceLevel> getAvailableExperienceLevels() {

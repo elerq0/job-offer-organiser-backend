@@ -9,7 +9,7 @@ import javax.persistence.Id;
 import javax.validation.constraints.NotEmpty;
 
 @Entity
-public class ProgrammingLanguage {
+public class Technology {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,10 +19,10 @@ public class ProgrammingLanguage {
     @NotEmpty
     private String name;
 
-    public ProgrammingLanguage() {
+    public Technology() {
     }
 
-    public ProgrammingLanguage(String name) {
+    public Technology(String name) {
         this.name = name;
     }
 

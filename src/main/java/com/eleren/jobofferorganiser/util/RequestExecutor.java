@@ -58,7 +58,11 @@ public class RequestExecutor {
             Elements elements = doc.select("div[class=table_block]").first().getElementsByTag("tbody").first().getElementsByTag("tr");
             for (int i = 1; i < elements.size(); i++) {
                 Elements e2 = elements.get(i).getElementsByTag("td");
-                proxyListDto.add(new ProxyDto(e2.get(0).text(), Integer.parseInt(e2.get(1).text())));
+
+                ProxyDto proxyDto = new ProxyDto();
+                proxyDto.setAddress(e2.get(0).text());
+                proxyDto.setPort(Integer.parseInt(e2.get(1).text()));
+                proxyListDto.add(proxyDto);
             }
 
             return proxyListDto;
@@ -71,6 +75,7 @@ public class RequestExecutor {
         System.setProperty("webdriver.chrome.driver", env.getProperty("chromedriverpath"));
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--headless", "--disable-gpu", "--window-size=1920,1200", "--ignore-certificate-errors", "--silent");
+        driver = null;
 
         do {
             try {

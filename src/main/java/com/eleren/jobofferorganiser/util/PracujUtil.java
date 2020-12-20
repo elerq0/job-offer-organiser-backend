@@ -79,8 +79,8 @@ public class PracujUtil implements WebsiteUtil {
     @Override
     public String buildUrl() {
         StringBuilder titleStr = new StringBuilder();
-        if (!searchOptionsDto.getProgrammingLanguage().equals(""))
-            titleStr.append(searchOptionsDto.getProgrammingLanguage()).append(" ");
+        if (!searchOptionsDto.getTechnology().equals(""))
+            titleStr.append(searchOptionsDto.getTechnology()).append(" ");
         titleStr.append(searchOptionsDto.getTitle());
 
         StringBuilder url = new StringBuilder();

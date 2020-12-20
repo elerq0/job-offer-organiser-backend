@@ -89,7 +89,7 @@ public class OfferService {
         return offerExpandedListDto;
     }
 
-    public void setFlags(User user, long searchOptionsId, long offerId, boolean applied, boolean skipped) throws Exception {
+    public void setAppliedFlag(User user, long searchOptionsId, long offerId, boolean applied) throws Exception{
         SearchOptions searchOptions = searchOptionsRepository.getOne(searchOptionsId);
         if (!searchOptions.getUser().equals(user))
             throw new Exception("You do not have access to that");
@@ -100,6 +100,20 @@ public class OfferService {
 
         SearchOptions_Offer searchOptionsOffer = searchOptionsOfferRepository.findBySearchOptionsAndOffer(searchOptions, offer).get();
         searchOptionsOffer.setApplied(applied);
+
+        searchOptionsOfferRepository.save(searchOptionsOffer);
+    }
+
+    public void setSkippedFlag(User user, long searchOptionsId, long offerId, boolean skipped) throws Exception {
+        SearchOptions searchOptions = searchOptionsRepository.getOne(searchOptionsId);
+        if (!searchOptions.getUser().equals(user))
+            throw new Exception("You do not have access to that");
+
+        Offer offer = offerRepository.getOne(offerId);
+        if (!searchOptionsOfferRepository.findBySearchOptionsAndOffer(searchOptions, offer).isPresent())
+            throw new Exception("Wrong offer entity");
+
+        SearchOptions_Offer searchOptionsOffer = searchOptionsOfferRepository.findBySearchOptionsAndOffer(searchOptions, offer).get();
         searchOptionsOffer.setSkipped(skipped);
 
         searchOptionsOfferRepository.save(searchOptionsOffer);

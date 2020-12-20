@@ -1,7 +1,7 @@
 package com.eleren.jobofferorganiser.controller;
 
 import com.eleren.jobofferorganiser.model.ExperienceLevel;
-import com.eleren.jobofferorganiser.model.ProgrammingLanguage;
+import com.eleren.jobofferorganiser.model.Technology;
 import com.eleren.jobofferorganiser.model.SearchOptions;
 import com.eleren.jobofferorganiser.model.Website;
 import com.eleren.jobofferorganiser.service.OfferService;
@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
+@CrossOrigin(origins = "*")
 @RequestMapping("search-options")
 public class SearchOptionsController {
 
@@ -30,9 +31,9 @@ public class SearchOptionsController {
     @Autowired
     private OfferService offerService;
 
-    @GetMapping(path = "/available-programming-languages")
-    public ResponseEntity<Iterable<ProgrammingLanguage>> getAvailableProgrammingLanguages() {
-        return new ResponseEntity<>(searchOptionsService.getAvailableProgrammingLanguages(), HttpStatus.OK);
+    @GetMapping(path = "/available-technologies")
+    public ResponseEntity<Iterable<Technology>> getAvailableTechnologies() {
+        return new ResponseEntity<>(searchOptionsService.getAvailableTechnologies(), HttpStatus.OK);
     }
 
     @GetMapping(path = "/available-experience-levels")
@@ -53,11 +54,11 @@ public class SearchOptionsController {
             String username = SecurityContextHolder.getContext().getAuthentication().getName();
 
             return new ResponseEntity<>(searchOptionsService.create(userService.getByUsername(username),
-                                    searchOptions.get("title").toString(),
-                                    searchOptions.get("location").toString(),
-                                    (List<String>)searchOptions.get("programmingLanguages"),
-                                    (List<String>)searchOptions.get("experienceLevels"),
-                                    (List<String>)searchOptions.get("websites")), HttpStatus.OK);
+                    searchOptions.get("title").toString(),
+                    searchOptions.get("location").toString(),
+                    (List<String>) searchOptions.get("technologies"),
+                    (List<String>) searchOptions.get("experienceLevels"),
+                    (List<String>) searchOptions.get("websites")), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
@@ -110,18 +111,34 @@ public class SearchOptionsController {
     }
 
     @PreAuthorize("isAuthenticated()")
-    @PutMapping(path = "/{id}/offers/{offerId}")
-    public ResponseEntity<?> setFlags(@PathVariable long id, @PathVariable long offerId, boolean applied, boolean skipped) {
+    @PutMapping(path = "/{id}/offers/{offerId}/applied")
+    public ResponseEntity<?> setAppliedFlag(@PathVariable long id,
+                                            @PathVariable long offerId,
+                                            @RequestBody Map<String, Object> body) {
         try {
             String username = SecurityContextHolder.getContext().getAuthentication().getName();
-            offerService.setFlags(userService.getByUsername(username), id, offerId, applied, skipped);
+            offerService.setAppliedFlag(userService.getByUsername(username),
+                    id, offerId, (boolean) body.get("value"));
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
-
+    @PreAuthorize("isAuthenticated()")
+    @PutMapping(path = "/{id}/offers/{offerId}/skipped")
+    public ResponseEntity<?> setSkippedFlag(@PathVariable long id,
+                                            @PathVariable long offerId,
+                                            @RequestBody Map<String, Object> body) {
+        try {
+            String username = SecurityContextHolder.getContext().getAuthentication().getName();
+            offerService.setSkippedFlag(userService.getByUsername(username),
+                    id, offerId, (boolean) body.get("value"));
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
 
 
 }

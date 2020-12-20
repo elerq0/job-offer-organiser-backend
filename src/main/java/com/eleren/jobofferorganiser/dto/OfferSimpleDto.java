@@ -11,7 +11,18 @@ public class OfferSimpleDto {
     }
 
     public void setCompanyName(String companyName) {
-        this.companyName = companyName.replaceAll("(?i)Sp. z o.o.", "").trim();
+        if (companyName.toLowerCase().replaceAll("\\s+", "").contains("zo.o.")) {
+            this.companyName = companyName
+                    .replaceAll("(?i)Sp.z o.o", "")
+                    .replaceAll("(?i)Sp. z o.o.", "")
+                    .replaceAll("(?i)Sp. z o. o.", "")
+                    .replaceAll("(?i)Spółka z o.o.", "")
+                    .replaceAll("(?i)SP Z O O", "")
+                    .replaceAll("(?i)z o.o.", "")
+                    .trim();
+        } else {
+            this.companyName = companyName.trim();
+        }
     }
 
     public String getOfferName() {

@@ -9,8 +9,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.Map;
 
 @RestController
+@CrossOrigin(origins = "*")
 @RequestMapping("user")
 public class UserController {
 
@@ -18,11 +20,11 @@ public class UserController {
     private UserService userService;
 
     @PostMapping(path = "/register")
-    public ResponseEntity<?> registerUser(@RequestParam String username,
-                                       @RequestParam String password,
-                                       @RequestParam String email) {
+    public ResponseEntity<?> registerUser(@RequestBody Map<String, String> user) {
         try {
-            userService.create(username, password, email);
+            userService.create(user.get("username"),
+                    user.get("password"),
+                    user.get("email"));
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
@@ -30,13 +32,13 @@ public class UserController {
     }
 
 
-    @GetMapping(path = "/login")
-    public ResponseEntity<?> login(HttpServletResponse response,
-                                        @RequestParam String username,
-                                        @RequestParam String password) {
+    @PostMapping(path = "/login")
+    public ResponseEntity<?> login(HttpServletResponse response, @RequestBody Map<String, String> user) {
         try {
-            response.setHeader("Authorization", userService.login(username, password));
-            response.setHeader("Access-control-expose-headers", "Authorization");
+            response.setHeader("Authorization",
+                    userService.login(user.get("username"), user.get("password")));
+            response.setHeader("Access-control-expose-headers",
+                    "Authorization");
             return new ResponseEntity<>(HttpStatus.OK);
 
         } catch (Exception e) {

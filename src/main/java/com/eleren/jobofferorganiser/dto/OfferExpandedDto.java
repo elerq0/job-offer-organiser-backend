@@ -8,7 +8,7 @@ public class OfferExpandedDto {
     private Long id;
     private String companyName;
     private String offerName;
-    private Set<String> offerLink = new HashSet<>();
+    private Set<String> offerLinks = new HashSet<>();
     private Boolean applied;
     private Boolean skipped;
 
@@ -36,12 +36,12 @@ public class OfferExpandedDto {
         this.offerName = offerName;
     }
 
-    public Set<String> getOfferLink() {
-        return offerLink;
+    public Set<String> getOfferLinks() {
+        return offerLinks;
     }
 
     public void addOfferLink(String link){
-        this.offerLink.add(link);
+        this.offerLinks.add(link);
     }
 
     public Boolean getApplied() {

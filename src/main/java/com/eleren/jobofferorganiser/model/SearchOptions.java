@@ -27,18 +27,18 @@ public class SearchOptions {
     private String location;
 
     @ManyToMany(cascade = CascadeType.PERSIST)
-    private final List<ProgrammingLanguage> programmingLanguages = new ArrayList<ProgrammingLanguage>();
+    private final List<Technology> technologies = new ArrayList<>();
 
     @ManyToMany(cascade = CascadeType.PERSIST)
-    private final List<ExperienceLevel> experienceLevels = new ArrayList<ExperienceLevel>();
+    private final List<ExperienceLevel> experienceLevels = new ArrayList<>();
 
     @ManyToMany(cascade = CascadeType.PERSIST)
     @NotEmpty
-    private final List<Website> websites = new ArrayList<Website>();
+    private final List<Website> websites = new ArrayList<>();
 
     @OneToMany(mappedBy = "searchOptions", cascade = CascadeType.ALL)
     @JsonIgnore
-    private final List<SearchOptions_Offer> searchOptionsOffers = new ArrayList<SearchOptions_Offer>();
+    private final List<SearchOptions_Offer> searchOptionsOffers = new ArrayList<>();
 
     public SearchOptions() {
     }
@@ -65,8 +65,8 @@ public class SearchOptions {
         return location;
     }
 
-    public List<ProgrammingLanguage> getProgrammingLanguages() {
-        return programmingLanguages;
+    public List<Technology> getTechnologies() {
+        return technologies;
     }
 
     public List<ExperienceLevel> getExperienceLevels() {
@@ -93,8 +93,8 @@ public class SearchOptions {
         this.location = location;
     }
 
-    public void addProgrammingLanguage(ProgrammingLanguage language) {
-        this.programmingLanguages.add(language);
+    public void addTechnology(Technology language) {
+        this.technologies.add(language);
     }
 
     public void addExperienceLevel(ExperienceLevel level) {
