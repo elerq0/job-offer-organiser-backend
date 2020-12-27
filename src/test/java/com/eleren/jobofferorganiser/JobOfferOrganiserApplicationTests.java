@@ -1,9 +1,9 @@
-package com.eleren.job_offer_organiser;
+package com.eleren.jobofferorganiser;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
+@SpringBootTest(classes = JobOfferOrganiserApplication.class)
 class JobOfferOrganiserApplicationTests {
 
     @Test
