@@ -6,19 +6,20 @@ public class ProxyListDto extends ArrayList<ProxyDto> {
 
     private int index = 0;
 
-    public ProxyDto getCurrent(){
+    public ProxyDto getCurrent() {
         return this.get(index);
     }
 
-    public boolean next() throws Exception {
-        if(this.size() == 0)
+    public String getCurrentString() {
+        return this.get(index).getAddress() + ":" + this.get(index).getPort();
+    }
+
+    public void next() throws Exception {
+        if (this.size() == 0)
             throw new Exception(this.getClass().getSimpleName() + " is empty");
 
         index++;
-        if(index >= this.size()) {
-            index = 0;
-            return true;
-        }
-        return false;
+        if (index >= this.size())
+            throw new Exception("End of proxy");
     }
 }

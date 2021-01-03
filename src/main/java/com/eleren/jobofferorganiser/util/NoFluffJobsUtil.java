@@ -43,8 +43,8 @@ public class NoFluffJobsUtil implements WebsiteUtil {
 
                 for (Element offer : doc.select("a[class*=posting-list-item posting-list-item]")) {
                     OfferSimpleDto offerSimpleDto = new OfferSimpleDto();
-                    offerSimpleDto.setOfferName(offer.select("h3[class*=posting-title]").first().text());
-                    offerSimpleDto.setCompanyName(offer.select("span[class*=posting-title__company]").first().text().trim().substring(2));
+                    offerSimpleDto.setOfferName(offer.select("div > h3").first().text()); // "h3[class*=posting-title]"
+                    offerSimpleDto.setCompanyName(offer.select("div > span").first().text().trim()); // "span[class*=posting-title__company]"
                     offerSimpleDto.setOfferLink(offer.absUrl("href"));
 
                     offerSimpleDtoList.add(offerSimpleDto);

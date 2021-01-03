@@ -2,10 +2,7 @@ package com.eleren.jobofferorganiser.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 
 @Entity
@@ -17,13 +14,10 @@ public class Website {
     private long id;
 
     @NotEmpty
+    @Column(unique = true)
     private String name;
 
     public Website() {
-    }
-
-    public Website(String name) {
-        this.name = name;
     }
 
     public long getId() {

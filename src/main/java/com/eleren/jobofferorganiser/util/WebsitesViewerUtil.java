@@ -25,9 +25,6 @@ public class WebsitesViewerUtil {
 
     public void setEnv(Environment env) throws Exception {
         this.env = env;
-
-        if (Objects.isNull(env.getProperty("chromedriverpath")) || Objects.requireNonNull(env.getProperty("chromedriverpath")).isEmpty())
-            throw new Exception("Environment property [chromedriverpath] needs to be set");
     }
 
     public List<OfferSimpleDto> getOffers() throws Exception {

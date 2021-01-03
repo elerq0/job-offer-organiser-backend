@@ -5,56 +5,67 @@ import com.eleren.jobofferorganiser.dto.ProxyListDto;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
+import org.openqa.selenium.By;
 import org.openqa.selenium.Proxy;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.springframework.core.env.Environment;
 
+import java.util.Objects;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class RequestExecutor {
 
-    private final Environment env;
+    private final ReentrantLock lock = new ReentrantLock();
     private final ProxyListDto proxyListDto;
     private WebDriver driver;
-    private final ReentrantLock lock = new ReentrantLock();
+
 
     public RequestExecutor(Environment env) throws Exception {
-        this.env = env;
+        if (Objects.isNull(env.getProperty("chromedriverpath")))
+            throw new Exception("Environment property [chromedriverpath] needs to be set");
+        else
+            System.setProperty("webdriver.chrome.driver", Objects.requireNonNull(env.getProperty("chromedriverpath")));
+
+        System.setProperty("webdriver.chrome.silentOutput", "true");
         proxyListDto = getProxy();
         driver = getDriver();
     }
 
-    public void close(){
-        this.driver.close();
-        this.driver.quit();
-    }
-
     public String execute(String url) throws Exception {
         lock.lock();
-        System.out.println("Processing url: [" + url + "]");
-        String html = "";
         try {
-            do {
-                try {
-                    driver.get(url);
+            System.out.println("Processing url: [" + url + "]");
+            driver.get(url);
+            if (driver.getTitle().toLowerCase().contains("captcha") ||
+                    driver.findElements(By.name("captcha-bypass")).size() > 0 ||
+                    driver.getPageSource().length() < 100)
+                throw new Exception("ERR_NO_READABLE_DATA");
 
-                    html = driver.getPageSource();
-                } catch (Exception e) {
-                    driver = getDriver();
-                }
-            } while (html.equals(""));
+            return driver.getPageSource();
+        } catch (Exception e) {
+            if (e.getMessage().contains("ERR_TUNNEL_CONNECTION_FAILED") ||
+                    e.getMessage().contains("ERR_PROXY_CONNECTION_FAILED") ||
+                    e.getMessage().contains("ERR_NO_READABLE_DATA") ||
+                    e.getMessage().contains("ERR_CONNECTION_RESET")) {
+                nextDriver();
+                return execute(url);
+            } else
+                throw new Exception(e.getMessage());
         } finally {
             lock.unlock();
         }
-        return html;
+    }
+
+    public void close() {
+        this.driver.quit();
     }
 
     private ProxyListDto getProxy() throws Exception {
         try {
             ProxyListDto proxyListDto = new ProxyListDto();
-            Document doc = Jsoup.connect("https://hidemy.name/en/proxy-list/?maxtime=600&type=h#list").get();
+            Document doc = Jsoup.connect("https://hidemy.name/en/proxy-list/?country=ALAMATBYBEBABGHRCYCZFIFRGEDEGRHUIEITKZLVMTMENLNOPLPTRORURSSKSIESSETRUAGB&maxtime=600&type=h&anon=1#list").get();
             Elements elements = doc.select("div[class=table_block]").first().getElementsByTag("tbody").first().getElementsByTag("tr");
             for (int i = 1; i < elements.size(); i++) {
                 Elements e2 = elements.get(i).getElementsByTag("td");
@@ -64,6 +75,8 @@ public class RequestExecutor {
                 proxyDto.setPort(Integer.parseInt(e2.get(1).text()));
                 proxyListDto.add(proxyDto);
             }
+            proxyListDto.add(new ProxyDto());
+            proxyListDto.add(null);
 
             return proxyListDto;
         } catch (Exception e) {
@@ -72,24 +85,32 @@ public class RequestExecutor {
     }
 
     private WebDriver getDriver() throws Exception {
-        System.setProperty("webdriver.chrome.driver", env.getProperty("chromedriverpath"));
-        ChromeOptions options = new ChromeOptions();
-        options.addArguments("--headless", "--disable-gpu", "--window-size=1920,1200", "--ignore-certificate-errors", "--silent");
-        driver = null;
+        ChromeOptions options = new ChromeOptions().addArguments(
+                "--headless",
+                "--no-sandbox",
+                "--ignore-certificate-errors",
+                "--disable-extensions",
+                "--disable-web-security",
+                "--silent");
 
-        do {
-            try {
-                Proxy proxy = new Proxy();
-                proxy.setAutodetect(false);
-                proxy.setHttpProxy(proxyListDto.getCurrent().getAddress() + ":" + proxyListDto.getCurrent().getPort());
-                options.setCapability("proxy", proxy);
-                driver = new ChromeDriver(options);
+        if (proxyListDto.getCurrent() == null)
+            throw new Exception("Can't execute request");
+        else if (proxyListDto.getCurrent().getAddress() != null) {
+            System.out.println("Setting up proxy: " + proxyListDto.getCurrentString());
 
-            } catch (Exception e) {
-                proxyListDto.next();
-            }
-        } while (driver == null);
-        return driver;
+            Proxy proxy = new Proxy();
+            proxy.setProxyType(Proxy.ProxyType.MANUAL);
+            proxy.setAutodetect(false);
+            proxy.setHttpProxy(proxyListDto.getCurrentString());
+            proxy.setSslProxy(proxyListDto.getCurrentString());
+            options.setCapability("proxy", proxy);
+        }
+        return new ChromeDriver(options);
     }
 
+    private void nextDriver() throws Exception {
+        close();
+        proxyListDto.next();
+        driver = getDriver();
+    }
 }
