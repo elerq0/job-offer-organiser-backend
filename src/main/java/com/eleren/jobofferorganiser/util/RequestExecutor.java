@@ -37,18 +37,26 @@ public class RequestExecutor {
         lock.lock();
         try {
             System.out.println("Processing url: [" + url + "]");
-            driver.get(url);
-            if (driver.getTitle().toLowerCase().contains("captcha") ||
-                    driver.findElements(By.name("captcha-bypass")).size() > 0 ||
-                    driver.getPageSource().length() < 100)
+            Thread t = new Thread(() -> driver.get(Thread.currentThread().getName()), url);
+            t.start();
+            t.join(8000);
+            if (t.isAlive()) {
+                t.interrupt();
+                throw new Exception("ERR_TIMEOUT");
+            } else if (driver.getTitle().toLowerCase().contains("captcha") ||
+                    driver.findElements(By.name("captcha-bypass")).size() > 0 || driver.getPageSource().length() < 100) {
                 throw new Exception("ERR_NO_READABLE_DATA");
+            }
 
             return driver.getPageSource();
         } catch (Exception e) {
             if (e.getMessage().contains("ERR_TUNNEL_CONNECTION_FAILED") ||
                     e.getMessage().contains("ERR_PROXY_CONNECTION_FAILED") ||
-                    e.getMessage().contains("ERR_NO_READABLE_DATA") ||
-                    e.getMessage().contains("ERR_CONNECTION_RESET")) {
+                    e.getMessage().contains("ERR_CONNECTION_RESET") ||
+                    e.getMessage().contains("ERR_CONNECTION_CLOSED") ||
+                    e.getMessage().equals("ERR_NO_READABLE_DATA") ||
+                    e.getMessage().equals("ERR_TIMEOUT")
+            ) {
                 nextDriver();
                 return execute(url);
             } else
@@ -113,4 +121,6 @@ public class RequestExecutor {
         proxyListDto.next();
         driver = getDriver();
     }
+
+
 }
